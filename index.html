@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024">
+    <title>Perjanjian Hutang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .pdf-hide { display: block; }
+        .pdf-mode .pdf-hide { display: none !important; }
+        .pdf-mode input { border: none !important; background: transparent !important; color: black; font-family: 'Merriweather', serif; font-size: 1.125rem; padding: 0 !important; }
+        .pdf-mode #signature-pad { border: none !important; background: transparent !important; box-shadow: none !important; }
+        
+        /* Format A4 Presisi - Anti Kepotong */
+        .pdf-mode { 
+            box-shadow: none !important; 
+            border: none !important; 
+            border-radius: 0 !important;
+            width: 800px !important; 
+            max-width: 800px !important;
+            min-width: 800px !important;
+            margin: 0 !important; 
+            padding: 40px !important; 
+            background: white !important;
+            position: relative !important;
+            left: 0 !important;
+            top: 0 !important;
+            transform: none !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen py-8">
+    <!-- Header Web -->
+    <div class="max-w-4xl mx-auto px-4 mb-6 flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight">E-Perjanjian</h1>
+            <p class="text-slate-500 text-sm mt-1">Sistem Digitalisasi Dokumen Finansial</p>
+        </div>
+        <div class="hidden sm:block text-right">
+            <span class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                Terenkripsi & Aman
+            </span>
+        </div>
+    </div>
+
+    <!-- Kertas Dokumen -->
+    <div id="dokumen-perjanjian" class="mx-auto max-w-4xl bg-white p-12 sm:p-16 rounded-xl shadow-2xl border border-slate-200 relative">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-indigo-600 pdf-hide"></div>
+
+        <div class="font-serif text-lg leading-relaxed text-slate-900">
+            <h2 class="text-2xl font-bold text-center uppercase tracking-widest mb-10 pb-4 border-b-2 border-slate-900 inline-block mx-auto w-full">Surat Perjanjian Hutang Piutang</h2>
+            
+            <p class="mb-6 text-justify">Pada hari ini, <strong id="tanggal-teks" class="font-bold">...</strong>, kami yang bertanda tangan di bawah ini:</p>
+            
+            <div class="mb-8 pl-4 border-l-4 border-blue-600 pdf-mode:border-slate-800">
+                <p class="font-bold text-slate-800 mb-2 font-sans tracking-wide text-sm uppercase text-blue-700">1. Pihak Pertama (Pemberi Pinjaman)</p>
+                <table class="w-full">
+                    <tr><td class="w-32 py-1">Nama</td><td class="font-semibold">: Heru Kurniawan</td></tr>
+                    <tr><td class="py-1">NIK</td><td>: 3329072807020003</td></tr>
+                    <tr><td class="py-1">Alamat</td><td>: Tegalwulung, rt 08 rw 02, kec. Jatibarang kab. Brebes</td></tr>
+                </table>
+            </div>
+            
+            <div class="mb-8 pl-4 border-l-4 border-emerald-600 pdf-mode:border-slate-800">
+                <p class="font-bold text-slate-800 mb-2 font-sans tracking-wide text-sm uppercase text-emerald-700">2. Pihak Kedua (Penerima Pinjaman)</p>
+                <table class="w-full">
+                    <tr>
+                        <td class="w-32 py-2 align-middle">Nama</td>
+                        <td class="flex items-center gap-2">: <input type="text" id="nama_ali" value="Ali Akbar" class="flex-1 border-b-2 border-slate-200 font-semibold focus:border-emerald-500 outline-none px-2 py-1 transition-colors font-sans" readonly></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 align-middle">NIK</td>
+                        <td class="flex items-center gap-2">: <input type="number" id="nik_ali" placeholder="Masukkan 16 Digit NIK" class="flex-1 border-b-2 border-slate-200 focus:border-emerald-500 outline-none px-2 py-1 transition-colors font-sans bg-slate-50 focus:bg-white"></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 align-middle">Alamat</td>
+                        <td class="flex items-center gap-2">: <input type="text" id="alamat_ali" placeholder="Alamat Domisili Lengkap" class="flex-1 border-b-2 border-slate-200 focus:border-emerald-500 outline-none px-2 py-1 transition-colors font-sans bg-slate-50 focus:bg-white"></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 align-middle">Pekerjaan</td>
+                        <td class="flex items-center gap-2">: <input type="text" id="pekerjaan_ali" placeholder="Pekerjaan Saat Ini" class="flex-1 border-b-2 border-slate-200 focus:border-emerald-500 outline-none px-2 py-1 transition-colors font-sans bg-slate-50 focus:bg-white"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Bagian Pasal-Pasal -->
+            <div class="mb-8 text-left leading-relaxed font-serif text-slate-800">
+                <p class="mb-5">Kedua belah pihak dengan ini menerangkan dan menyatakan telah sepakat untuk mengikatkan diri dalam perjanjian hutang piutang dengan ketentuan yang diatur dalam pasal-pasal berikut:</p>
+                
+                <div class="mb-4 pl-4 border-l-2 border-slate-300">
+                    <h3 class="font-bold text-slate-900 font-sans text-sm uppercase tracking-wider mb-1">Pasal 1: Nominal Pinjaman</h3>
+                    <p>PIHAK PERTAMA memberikan pinjaman dana kepada PIHAK KEDUA sebesar <strong>Rp3.000.000 (Tiga Juta Rupiah)</strong>. Surat perjanjian ini sekaligus berlaku sebagai tanda terima (kuitansi) yang sah setelah ditandatangani.</p>
+                </div>
+
+                <div class="mb-4 pl-4 border-l-2 border-slate-300">
+                    <h3 class="font-bold text-slate-900 font-sans text-sm uppercase tracking-wider mb-1">Pasal 2: Kewajiban Pengembalian</h3>
+                    <p>PIHAK KEDUA berkewajiban mutlak untuk mengembalikan dana pinjaman kepada PIHAK PERTAMA dengan total nominal <strong>Rp3.500.000 (Tiga Juta Lima Ratus Ribu Rupiah)</strong> selambat-lambatnya dalam waktu <strong>1 (satu) bulan</strong> terhitung sejak perjanjian ini disepakati.</p>
+                </div>
+
+                <div class="mb-4 pl-4 border-l-2 border-slate-300">
+                    <h3 class="font-bold text-slate-900 font-sans text-sm uppercase tracking-wider mb-1">Pasal 3: Perselisihan & Sanksi</h3>
+                    <p>Apabila PIHAK KEDUA tidak dapat memenuhi kewajiban pengembalian pada batas waktu yang ditetapkan di Pasal 2, maka penyelesaian akan diupayakan secara musyawarah. Apabila tidak tercapai mufakat, PIHAK PERTAMA berhak penuh menuntut penyelesaian melalui jalur hukum yang berlaku.</p>
+                </div>
+                
+                <p class="mt-6">Demikian surat perjanjian ini dibuat dalam keadaan sadar, sehat jasmani dan rohani, serta tanpa paksaan dari pihak mana pun.</p>
+            </div>
+            
+            <!-- Area Tanda Tangan -->
+            <div class="flex justify-between mt-12 text-base">
+                <div class="text-center w-5/12 flex flex-col items-center">
+                    <p class="mb-2">PIHAK PERTAMA</p>
+                    <div class="h-32 w-full flex items-end justify-center relative">
+                        <!-- Tanda Tangan Heru -->
+                        <img src="download.png" alt="Tanda Tangan Heru Kurniawan" class="max-h-24 object-contain">
+                    </div>
+                    <p class="font-bold underline uppercase mt-2">Heru Kurniawan</p>
+                </div>
+                
+                <div class="text-center w-5/12 flex flex-col items-center">
+                    <p class="mb-2">PIHAK KEDUA</p>
+                    <div class="relative w-full flex flex-col items-center">
+                        <!-- Tanda Tangan Ali -->
+                        <canvas id="signature-pad" class="w-full max-w-[250px] h-32 bg-slate-50 border-2 border-dashed border-slate-300 rounded-lg shadow-inner cursor-crosshair transition-colors hover:border-emerald-400"></canvas>
+                        <button onclick="signaturePad.clear()" class="pdf-hide absolute -bottom-6 text-xs font-sans text-rose-500 hover:text-rose-700 font-medium flex items-center gap-1 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Hapus
+                        </button>
+                    </div>
+                    <p class="font-bold underline uppercase mt-8">Ali Akbar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol Submit -->
+    <div class="max-w-4xl mx-auto mt-8 mb-12 text-center relative z-10">
+        <button id="btn-submit" class="group relative w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-slate-900 text-white px-8 py-4 rounded-full font-bold text-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.24)] hover:bg-slate-800 hover:-translate-y-0.5 transition-all duration-200">
+            <span>Setujui & Simpan Perjanjian</span>
+            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+        <p id="status-text" class="text-sm font-medium text-slate-500 mt-4 h-6"></p>
+    </div>
+
+    <!-- Script Utama (Supabase & PDF) -->
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        // URL dan Key Supabase Abang
+        const SUPABASE_URL = 'https://gubnixlyotwyrqwctvxp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_FOjmU05pn5_gmDY6lrhbKQ_B9kbfaiL';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Set Tanggal UI
+        const today = new Date();
+        document.getElementById('tanggal-teks').innerText = today.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Setup Signature Pad
+        const canvas = document.getElementById('signature-pad');
+        function resizeCanvas() {
+            const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        window.signaturePad = new SignaturePad(canvas, {
+            penColor: "rgb(15, 23, 42)", 
+            backgroundColor: "rgba(255, 255, 255, 0)" 
+        });
+
+        // Proses Submit
+        document.getElementById('btn-submit').addEventListener('click', async () => {
+            if (signaturePad.isEmpty()) {
+                alert("Tanda tangan dulu ya, Bang!");
+                canvas.classList.add('border-rose-500');
+                setTimeout(() => canvas.classList.remove('border-rose-500'), 1000);
+                return;
+            }
+
+            const btn = document.getElementById('btn-submit');
+            const status = document.getElementById('status-text');
+            const element = document.getElementById('dokumen-perjanjian');
+            
+            btn.disabled = true;
+            btn.innerHTML = `Memproses Dokumen...`;
+            status.innerText = "Mempersiapkan PDF...";
+            status.className = "text-sm font-medium text-slate-500 mt-4 h-6";
+
+            // TRIK PDF: Copot mx-auto biar dokumen merapat ke kiri, mencegah kepotong!
+            element.classList.remove('mx-auto'); 
+            element.classList.add('pdf-mode');
+
+            // Setting PDF Stabil
+            const opt = {
+                margin:       10, 
+                filename:     `Surat_Perjanjian_Hutang_${Date.now()}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 800, scrollX: 0, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                // 1. "Foto" suratnya menjadi gambar
+                const canvasImg = await html2canvas(element, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: "#ffffff" 
+                });
+                
+                // Kembalikan posisi web ke tengah
+                element.classList.remove('pdf-mode');
+                element.classList.add('mx-auto');
+                
+                status.innerText = "Mengunggah perjanjian...";
+                
+                // 2. Ubah hasil foto jadi file JPG
+                canvasImg.toBlob(async (blob) => {
+                    const fileName = `Perjanjian_Ali_${Date.now()}.jpg`;
+                    
+                    // 3. Upload file JPG ke Storage Supabase
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('perjanjian')
+                        .upload(fileName, blob, {
+                            contentType: 'image/jpeg',
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+
+                    if (uploadError) throw uploadError;
+
+                    // 4. Ambil link URL gambarnya
+                    const { data: publicUrlData } = supabase.storage.from('perjanjian').getPublicUrl(fileName);
+                    const downloadURL = publicUrlData.publicUrl;
+
+                    status.innerText = "Menyimpan data ke Database...";
+                    
+                    // 5. Simpan ke tabel database
+                    const { data: insertData, error: insertError } = await supabase
+                        .from('surat_perjanjian')
+                        .insert([{ 
+                            nama: 'Ali Akbar', 
+                            nik: document.getElementById('nik_ali').value || '-',
+                            file_url: downloadURL 
+                        }]);
+
+                    if (insertError) throw insertError;
+
+                    status.className = "text-sm font-bold text-emerald-600 mt-4 h-6";
+                    status.innerText = "✓ Surat berhasil disepakati dan disimpan.";
+                    btn.innerHTML = "Berhasil Disimpan";
+                    
+                    setTimeout(() => { alert("Perjanjian sukses direkam! Terima kasih atas kerja sama nya😎"); }, 500);
+
+                }, 'image/jpeg', 0.9); // 0.9 adalah kualitas gambar (90%)
+
+            } catch (error) {
+                console.error("Error Detail:", error);
+                element.classList.remove('pdf-mode');
+                element.classList.add('mx-auto');
+                status.className = "text-sm font-bold text-rose-600 mt-4 h-6";
+                status.innerText = "Gagal: Terjadi kesalahan sistem.";
+                btn.disabled = false;
+                btn.innerHTML = "Coba Lagi";
+            }
+        });
+    </script>
+</body>
+</html>
